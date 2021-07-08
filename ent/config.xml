@@ -1,6 +1,6 @@
 <config programVersion='1.0' configVersion='0'>
 	<listen ip='*' port='80' type='http'/>
-	<listen ip='*' port='3311' type='manage' />
+	<listen ip='*' port='3311' type='manage'/>
 	<lang>zh_CN</lang>
 	<keep_alive>30</keep_alive>
 	<keep_alive_count>2000</keep_alive_count>
@@ -12,8 +12,8 @@
 	<autoupdate type='off' install='0'/>
 	<admin user='admin' password='kangle' admin_ips='127.0.0.1|*'/>
 	<gzip default='0' only_gzip_cache='0' min_gzip_length='256' gzip_level='5'/>
-	<cache default='1' max_cache_size='1M' max_bigobj_size='2G' memory='50M' disk='5G' disk_dir='/var/cache/kangle' refresh_time='31536000'/>
-	<connect max_per_ip='65535' max='1000000' />
+	<cache default='1' max_cache_size='1M' max_bigobj_size='2G' memory='50M' disk='5G' disk_dir='/var/cache/kangle' cache_part='1' refresh_time='31536000'/>
+	<connect max_per_ip='65535' max='1000000'/>
 	<max_post_size>10G</max_post_size>
 	<async_io>1</async_io>
 	<attack enable='0' max_request='30' total_seconds='20' path_info='1'/>
@@ -30,9 +30,23 @@
 	<access_log_handle>/usr/bin/gzip ${log_file}</access_log_handle>
 	<log_handle_concurrent>2</log_handle_concurrent>
 	<log level='3' rotate_time='0 0 * * *' rotate_size='50M' error_rotate_size='2M' logs_day='7' logs_size='2G' log_handle='1'/>
+	<log_event_id>1</log_event_id>
 	<api name='whm' file='buildin:whm'/>
 	<request action='vhs' >
 	<table name='BEGIN'>
+            <chain  action='deny' >
+                <mark_check_black_list></mark_check_black_list>
+            </chain>
+            <chain  action='deny' >
+				<acl_url  nc='1'><![CDATA[:3312/api/]]></acl_url>
+				<acl_url revers='1'  nc='1'><![CDATA[:3312/api/[\s\S]*a=migrate]]></acl_url>
+				<acl_url revers='1'  nc='1'><![CDATA[:3312/api/[\s\S]*a=list]]></acl_url>
+				<acl_url revers='1'  nc='1'><![CDATA[:3312/api/[\s\S]*a=test]]></acl_url>
+				<acl_url revers='1'  nc='1'><![CDATA[:3312/api/[\s\S]*a=get]]></acl_url>
+				<acl_url revers='1'  nc='1'><![CDATA[:3312/api/[\s\S]*a=sync]]></acl_url>
+                <acl_ip_rate request='6' second='60'></acl_ip_rate>
+                <mark_black_list></mark_black_list>
+            </chain>
 			<chain  action='deny' >
                 <acl_meth >HEAD</acl_meth>
             </chain>
@@ -41,9 +55,24 @@
 				<mark_param   value='&#39;.*[; ]?((or)|(insert)|(select)|(union)|(update)|(delete)|(replace)|(create)|(drop)|(alter)|(grant)|(load)|(show)|(exec))[\s(]' get='1'  post='1'  icase='1'  charset=''></mark_param>
 			</chain>
 			<chain  action='deny' >
-			<acl_listen_ports revers='1'  split='|'>3312</acl_listen_ports>
+			<acl_url revers='1'  nc='1'><![CDATA[:3312/vhost/[\s\S]*c=webftp&a=upsave]]></acl_url>
 				<mark_post_file   filename='\.((php)|(asp))$' icase='1'></mark_post_file>
 			</chain>
+            <chain  action='deny' >
+                <acl_url  nc='1'><![CDATA[:3312/admin/[\s\S]*c=system&a=editFile&]]></acl_url>
+                <mark_param  revers='1'  name='file' value='/vhs/kangle/etc/../ext/tpl_php52/php-templete.ini' get='1'  post='1'  icase='1'  charset=''></mark_param>
+            </chain>
+            <chain  action='deny' >
+                <acl_listen_ports  split='|'>3312</acl_listen_ports>
+                <acl_url revers='1'  nc='1'><![CDATA[:3312/vhost/[\s\S]*c=webftp&a=]]></acl_url>
+                <acl_url revers='1'  nc='1'><![CDATA[:3312/admin/[\s\S]*c=migrate&a=]]></acl_url>
+                <acl_url revers='1'  nc='1'><![CDATA[:3312/api/[\s\S]*a=migrate]]></acl_url>
+                <acl_url revers='1'  nc='1'><![CDATA[:3312/api/[\s\S]*=sync]]></acl_url>
+                <acl_url revers='1'  nc='1'><![CDATA[:3312/vhost/[\s\S]*c=anticc&a=]]></acl_url>
+                <acl_url revers='1'  nc='1'><![CDATA[:3312/vhost/[\s\S]*c=protection&a=]]></acl_url>
+                <acl_url revers='1'  nc='1'><![CDATA[:3312/vhost/[\s\S]*c=index&a=ssl]]></acl_url>
+                <mark_param   value='.*(exec|insert|truncate|char|declare|union|replace|alter|grant|etc/|win.ini|chmod|closedir|copy|dir|escapeshellarg|escapeshellcmd|phpinfo|fclose|fileperms|fopen|fread|fwrite|is_dir|link|mkdir|opendir|passthru|proc_close|proc_get_status|proc_nice|proc_open|proc_terminate|readdir|rename|rmdir|shell_exec|system|tempnam|touch|unlink)+.*' get='1'  post='1'  icase='1'  charset=''></mark_param>
+            </chain>
 			<chain  action='continue' >
                 <mark_replace_ip   header='X-Real-Ip' > </mark_replace_ip>
             </chain>
@@ -63,20 +92,36 @@
 	<response action='allow' >
 	<table name='BEGIN'>
 			<chain  action='continue' >
-				<acl_header header='Content-Type' regex='1'><![CDATA[(text/*)|(javascript)|(image/*)]]></acl_header>
+				<acl_header header='Content-Type' regex='1'><![CDATA[(text/*)|(javascript)]]></acl_header>
 				<mark_response_flag   flagvalue='gzip,'></mark_response_flag>
+			</chain>
+			<chain  action='continue' >
+				<acl_header header='Content-Type' regex='1'><![CDATA[(text/*)|(javascript)]]></acl_header>
+				<mark_add_header   attr='Vary' val='Accept-Encoding'></mark_add_header>
 			</chain>
 			<chain  action='continue' >
 				<mark_cookie   cookie='.' http_only='1'></mark_cookie>
 			</chain>
 			<chain  action='continue' >
-				<acl_file_ext  icase='1' split='|'>3gp|7z|apk|avi|bdmv|bmp|bz2|css|csv|dat|db|deb|dll|dmg|doc|exe|f4v|flv|gif|gz|ico|img|inf|iso|jar|jpg|jpge|js|letv|log|m2ts|map|md5|mkv|mp3|mp4|msi|old|otf|pac|pdf|png|rar|rpm|sh|swf|tar|test|torrent|ttf|txt|txz|wim|xz|zip</acl_file_ext>
+				<acl_file_ext  icase='1' split='|'>3gp|7z|apk|avi|bdmv|bmp|bz2|css|csv|dat|db|deb|dll|dmg|doc|exe|f4v|flv|gif|gz|ico|img|inf|iso|jar|jpg|jpeg|js|letv|log|m2ts|map|md5|mkv|mp3|mp4|msi|old|otf|pac|pdf|png|rar|rpm|sh|swf|tar|test|torrent|ttf|txt|txz|wim|xz|zip</acl_file_ext>
 				<acl_status_code op='lt' code='400'></acl_status_code>
 				<mark_cache_control   max_age='31536000'></mark_cache_control>
 			</chain>
 			<chain  action='continue' >
 				<acl_status_code op='gt' code='400'></acl_status_code>
 				<mark_response_flag   flagvalue='nocache,nodiskcache,'></mark_response_flag>
+			</chain>
+			<chain  action='continue' >
+				<acl_listen_ports  split='|'>3313</acl_listen_ports>
+				<acl_reg_path  nc='1' path='/mysql/(changelog|url).php'></acl_reg_path>
+				<mark_add_header   attr='X-Frame-Options' val='SAMEORIGIN' force='0'></mark_add_header>
+			</chain>
+			<chain  action='deny' >
+				<acl_listen_ports  split='|'>3313</acl_listen_ports>
+				<acl_header header='Content-Type' nc='1'><![CDATA[text/html]]></acl_header>
+				<acl_header header='Cache-Control' nc='1'><![CDATA[pre-check=10800]]></acl_header>
+				<acl_header revers='1' header='WWW-Authenticate' nc='1'><![CDATA[Basic realm="phpMyAdmin localhost"]]></acl_header>
+				<acl_header revers='1' header='X-Frame-Options' nc='1'><![CDATA[SAMEORIGIN]]></acl_header>
 			</chain>
 		</table>
 	</response>
@@ -233,7 +278,7 @@
 <mime_type ext='zlib' type='application/x-deflate' max_age='31536000'/>
 	</vhs>
 	<vh name='default' doc_root='www'>
-	<mime_type ext='html' type='text/html' gzip='1' max_age='60'/>
+	<mime_type ext='html' type='text/html' gzip='1' max_age='10'/>
 		<host>*</host>
 	</vh>
 </config>

@@ -56,6 +56,57 @@ kangle web server 8核心8G内存VPS实测跑60W并发连接数妥妥的
 
 kangle web server 更新日志
 -------
+2020-06-19 kangle 3.5.21
+*支持br压缩
+*支持新的dso模块
+*修复一些错误
+
+2019-12-27 kangle 3.5.19
+*支持vary缓存
+*增加vary标记模块
+*3311缓存统计，分别统计内存和磁盘缓存数量
+
+2019-11-19 kangle 3.5.18
+*支持openssl 1.1.1
+*支持tls 1.3和early data
+*支持tcp fastopen
+*发送http请求到https端口，显示友好信息或配置自动重定向到https
+*修改server_software无需重起生效
+*其他细节优化
+
+2019-06-10 kangle 3.5.16
+*修复websocket和gzip压缩冲突的bug
+*meth匹配模块支持多个
+*修复ajp协议的几个bug.
+*扩展映射确认文件存在，新增一个确认不存在。
+*修复freebsd上编译的bug.
+
+2019-05-10 kangle 3.5.15
+*底层异步io，抽出为kasync库，采用c编写，方便移植,结构更清晰
+*去掉cgi/uwsgi/scgi/hmux协议支持
+*性能有一定的提升
+*修复centos 7上存在的一些问题
+*windows采用exe替换msi安装包
+
+2018-08-22 kangle 3.5.14
+修复无法和openssl 1.1.0编译的bug
+linux下编译无需依赖libaio.h
+增加请求控制中add_response_header模块，用于回应301，302时插入自定义的header
+增加PROXY协议,四层代理时，可传递真实地址.
+修复一些小问题。
+
+2018-06-08 kangle 3.5.13.2
+修复有限速的情况下会导致连接资源泄漏
+修复在连接信息中无法查看到http2的连接
+
+2018-06-04 kangle 3.5.13
+linux的epoll改用边缘触发
+域名解析增加缓存机制
+网络事件和http2的代码改用无锁机制
+移除cname绑定支持
+修复freebsd上的编译bug
+修复一处无缓存本地访问在http2下，流量大时会发送部分错误的内容
+
 2017-12-26 kangle 3.5.12
 缓存交换重构为异步io
 linux使用系统原生异步io，并发宽带吞吐性能更高
