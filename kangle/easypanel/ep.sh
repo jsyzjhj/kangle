@@ -1,7 +1,7 @@
 #/bin/sh
-KANGLE_VERSION="3.5.12.11"
+KANGLE_VERSION="3.5.21.4"
 PHP_VERSION="5.2.17"
-EASYPANEL_VERSION="2.6.22"
+EASYPANEL_VERSION="2.6.26"
 PUREFTP_VERSION="1.0.36"
 PREFIX="/vhs/kangle"
 CONFIG_FILES="/ext/tpl_php52/php-templete.ini"
@@ -137,9 +137,9 @@ function stat_iptables
 	if [ !  -f /etc/init.d/iptables ] ; then
 		return;
 	fi
-	service iptables stop
-	chkconfig iptables off
-	/etc/init.d/iptables stop
+	service iptables stop 2&> /dev/null
+	chkconfig iptables off 2&> /dev/null
+	/etc/init.d/iptables stop 2&> /dev/null
 	/etc/init.d/iptables save
 	return;
 	/sbin/iptables -I INPUT -p tcp --dport 80 -j ACCEPT
@@ -306,7 +306,7 @@ function del_proftpd
 	#rm -f /etc/init.d/proftpd
 	#rm -f /etc/rc.d/rc3.d/S96proftpd
 	#rm -f /etc/rc.d/rc5.d/S96proftpd
-	chkconfig proftpd off
+	chkconfig proftpd off 2&> /dev/null
 	killall proftpd
 	
 }
@@ -316,8 +316,8 @@ function setup_webalizer
 	if [ ! -f /usr/bin/webalizer ] ; then
 		yum -y install webalizer
 	fi
-	chkconfig httpd off
-	chkconfig nginx off
+	chkconfig httpd off 2&> /dev/null
+	chkconfig nginx off 2&> /dev/null
 	return;
 }
 function write_partner
@@ -335,8 +335,8 @@ fi
 ent=`/vhs/kangle/bin/kangle -v |grep "enterprise" -o`
 echo "ent="$ent;
 echo $PHPNAME
-service httpd stop
-service nginx stop
+service httpd stop 2&> /dev/null
+service nginx stop 2&> /dev/null
 mkdir tmp
 cd tmp
 setup_system
@@ -371,6 +371,38 @@ rm -rf /vhs/kangle/nodewww/webftp/admin/view/default/common/product.html
 wget http://github.itzmx.com/1265578519/kangle/master/easypanel/product.html -O /vhs/kangle/nodewww/webftp/admin/view/default/common/product.html
 rm -rf /vhs/kangle/ext/webalizer.xml
 wget http://github.itzmx.com/1265578519/kangle/master/easypanel/log_gz.xml -O /vhs/kangle/ext/log_gz.xml
+rm -rf /vhs/kangle/nodewww/webftp/vhost/view/default/top.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/top.html -O /vhs/kangle/nodewww/webftp/vhost/view/default/top.html
+rm -rf /vhs/kangle/nodewww/webftp/vhost/view/default/cacheclean/cachecleanfrom.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/cachecleanfrom.html -O /vhs/kangle/nodewww/webftp/vhost/view/default/cacheclean/cachecleanfrom.html
+rm -rf /vhs/kangle/nodewww/webftp/admin/view/default/nodes/addnode.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/addnode.html -O /vhs/kangle/nodewww/webftp/admin/view/default/nodes/addnode.html
+rm -rf /vhs/kangle/nodewww/webftp/admin/view/default/scripts/func.js
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/func.js -O /vhs/kangle/nodewww/webftp/admin/view/default/scripts/func.js
+rm -rf /vhs/kangle/nodewww/webftp/admin/view/default/virtualhost/virtualhost.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/virtualhost.html -O /vhs/kangle/nodewww/webftp/admin/view/default/virtualhost/virtualhost.html
+rm -rf /vhs/kangle/nodewww/webftp/admin/cnzz.html
+rm -rf /vhs/kangle/nodewww/webftp/vhost/cnzz.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/cnzz.html -O /vhs/kangle/nodewww/webftp/admin/cnzz.html
+\cp -f /vhs/kangle/nodewww/webftp/admin/cnzz.html /vhs/kangle/nodewww/webftp/vhost/cnzz.html
+rm -rf /vhs/kangle/nodewww/webftp/admin/view/default/common/foot.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/admin/foot.html -O /vhs/kangle/nodewww/webftp/admin/view/default/common/foot.html
+rm -rf /vhs/kangle/nodewww/webftp/admin/view/default/main.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/admin/main.html -O /vhs/kangle/nodewww/webftp/admin/view/default/main.html
+rm -rf /vhs/kangle/nodewww/webftp/admin/view/default/login_error.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/admin/login_error.html -O /vhs/kangle/nodewww/webftp/admin/view/default/login_error.html
+rm -rf /vhs/kangle/nodewww/webftp/vhost/view/default/common/foot.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/vhost/foot.html -O /vhs/kangle/nodewww/webftp/vhost/view/default/common/foot.html
+rm -rf /vhs/kangle/nodewww/webftp/vhost/view/default/common/head.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/vhost/head.html -O /vhs/kangle/nodewww/webftp/vhost/view/default/common/head.html
+rm -rf /vhs/kangle/nodewww/webftp/vhost/view/default/login.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/vhost/login.html -O /vhs/kangle/nodewww/webftp/vhost/view/default/login.html
+rm -rf /vhs/kangle/nodewww/webftp/vhost/view/default/loginerror.html
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/vhost/loginerror.html -O /vhs/kangle/nodewww/webftp/vhost/view/default/loginerror.html
+rm -rf /vhs/kangle/ext/tpl_php52/php-templete.ini
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/php-templete.ini -O /vhs/kangle/ext/tpl_php52/php-templete.ini
+rm -rf /vhs/kangle/ext/tpl_php52/etc/php-node.ini
+wget http://github.itzmx.com/1265578519/kangle/master/easypanel/php-node.ini -O /vhs/kangle/ext/tpl_php52/etc/php-node.ini
 $PREFIX/bin/kangle -q
 killall -9 kangle
 sleep 3
